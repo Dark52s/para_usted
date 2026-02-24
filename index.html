@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- ESTILOS GENERALES --- */
         body {
             font-family: 'Dancing Script', cursive;
             text-align: center;
@@ -31,7 +30,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- PANTALLA DE INICIO (FADE LENTO) --- */
+        /* Pantalla de inicio - Fade lento */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -48,7 +47,7 @@
             50% { opacity: 1; transform: scale(1.05); }
         }
 
-        /* --- CONTENEDOR PRINCIPAL --- */
+        /* Contenedor Translúcido */
         .container {
             background: rgba(255, 255, 255, 0.15); 
             padding: 30px 20px;
@@ -68,19 +67,16 @@
         .subtitulo { font-size: 1.3rem; color: #ffffff; margin-bottom: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
         #contador { font-size: 1.8rem; font-weight: 700; margin: 15px 0; color: #ffffff; text-shadow: 1px 1px 5px rgba(0,0,0,0.4); line-height: 1.2; }
 
-        /* --- FOTOS SIEMPRE EN LÍNEA --- */
+        /* Fotos en línea para móvil */
         .fotos { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            gap: 10px; /* Espacio entre fotos y corazón */
+            gap: 10px; 
             margin-top: 20px;
             width: 100%;
         }
-        .foto-card { 
-            width: 35%; /* Reducido para que quepa bien en móviles */
-            text-align: center; 
-        }
+        .foto-card { width: 35%; text-align: center; }
         img { 
             width: 100%; 
             border-radius: 50%; 
@@ -93,7 +89,7 @@
 
         .mensaje { margin-top: 20px; font-size: 1.4rem; line-height: 1.3; color: #ffffff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
 
-        /* --- SECCIÓN METAS (DESPLEGABLE) --- */
+        /* Metas Desplegables */
         .btn-metas {
             margin-top: 25px;
             background: rgba(255, 255, 255, 0.1);
@@ -109,7 +105,7 @@
         #metas-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.6s ease-in-out;
+            transition: max-height 0.8s ease-in-out;
             text-align: left;
         }
         .lista-metas {
@@ -118,10 +114,10 @@
             color: white;
             font-size: 1.2rem;
         }
-        .lista-metas li { margin: 8px 0; display: flex; align-items: center; }
-        .lista-metas li span { margin-right: 10px; }
+        .lista-metas li { margin: 12px 0; display: flex; align-items: flex-start; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .lista-metas li span { margin-right: 12px; font-size: 1.4rem; }
 
-        /* --- LLUVIA --- */
+        /* Lluvia */
         .corazon { position: fixed; top: -10vh; color: #ff4d6d; font-size: 1.5rem; z-index: 1; pointer-events: none; animation: caer linear forwards; }
         @keyframes caer { to { transform: translateY(110vh) translateX(20px); } }
     </style>
@@ -157,14 +153,18 @@
             "Quiero dedicar cada uno de mis dias a estar contigo, a progresar juntos, a cumplir y tener todo lo q siempre hemos soñado.. Te elegi a ti, y siempre te elegire a ti. Te amo mi princesa hermosa... prometo cuidarte por siempre y darte todo lo q este a mi alcance ❤"
         </div>
 
-        <button class="btn-metas" onclick="toggleMetas()">✨ Nuestras Metas</button>
+        <button class="btn-metas" onclick="toggleMetas()">✨ Nuestras Metas a Futuro</button>
         
         <div id="metas-content">
             <ul class="lista-metas">
-                <li><span>🏠</span> Tener nuestro propio hogar.</li>
-                <li><span>✈</span> Viajar y conocer lugares juntos.</li>
-                <li><span>💍</span> Un futuro compartiendo cada día.</li>
-                <li><span>🎓</span> Apoyarnos en cada logro personal.</li>
+                <li><span>🏠</span> Tener una prefabricada, o nuestro super bus de viaje.</li>
+                <li><span>✈</span> Viajar y conocer muchos sitios de chile (puedes manejar si gustas).</li>
+                <li><span>🛻</span> Tener nuestro auto o camioneta (Ford Raptor, Hilux o Tundra).</li>
+                <li><span>🍱</span> Que me compres mi lonche, que vean q tengo dueña.</li>
+                <li><span>💻</span> Tener nuestras pc's gamer.</li>
+                <li><span>🍴</span> Cocinar juntos, comer bien y experimentar en la cocina.</li>
+                <li><span>💍</span> Mi mayor sueño es que podamos casarnos algún día y permanecer a tu lado por siempre.</li>
+                <li><span>❤</span> No pienso dejar que abandonemos todo esto, déjame cumplir por favor...</li>
             </ul>
         </div>
     </div>
@@ -204,6 +204,10 @@
                 content.style.maxHeight = "0px";
             } else {
                 content.style.maxHeight = content.scrollHeight + "px";
+                // Pequeño delay para que el scroll acompañe la apertura
+                setTimeout(() => {
+                    content.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }, 300);
             }
         }
 
