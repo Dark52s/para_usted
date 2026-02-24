@@ -19,7 +19,7 @@
             background-attachment: fixed;
             background-repeat: no-repeat;
             margin: 0;
-            padding: 40px 10px;
+            padding: 20px 10px;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -31,16 +31,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- PANTALLA DE INICIO --- */
+        /* --- PANTALLA DE INICIO (FADE LENTO) --- */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #000;
             display: flex; justify-content: center; align-items: center;
             z-index: 9999;
-            transition: opacity 1.5s ease-in-out, visibility 1.5s step-end;
+            transition: opacity 4s ease-in-out, visibility 4s step-end;
         }
-        #splash-screen p { color: white; font-size: 2rem; animation: palpitar 2s infinite ease-in-out; }
+        #splash-screen p { color: white; font-size: 1.8rem; animation: palpitar 2s infinite ease-in-out; }
         #splash-screen.oculto { opacity: 0; visibility: hidden; }
 
         @keyframes palpitar {
@@ -51,12 +51,12 @@
         /* --- CONTENEDOR PRINCIPAL --- */
         .container {
             background: rgba(255, 255, 255, 0.15); 
-            padding: 40px;
+            padding: 30px 20px;
             border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            max-width: 550px;
-            width: 90%;
+            max-width: 500px;
+            width: 95%;
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
             position: relative;
@@ -64,47 +64,61 @@
             margin: auto; 
         }
 
-        h1 { color: #ffffff; font-size: 2.8rem; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .subtitulo { font-size: 1.4rem; color: #ffffff; margin-bottom: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
-        #contador { font-size: 2.2rem; font-weight: 700; margin: 15px 0; color: #ffffff; text-shadow: 1px 1px 5px rgba(0,0,0,0.4); }
+        h1 { color: #ffffff; font-size: 2.5rem; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .subtitulo { font-size: 1.3rem; color: #ffffff; margin-bottom: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+        #contador { font-size: 1.8rem; font-weight: 700; margin: 15px 0; color: #ffffff; text-shadow: 1px 1px 5px rgba(0,0,0,0.4); line-height: 1.2; }
 
-        .fotos { display: flex; justify-content: space-around; margin-top: 20px; align-items: center; flex-wrap: wrap; }
-        .foto-card { width: 40%; text-align: center; min-width: 120px; }
-        img { width: 100%; border-radius: 50%; aspect-ratio: 1/1; object-fit: cover; border: 3px solid rgba(255, 255, 255, 0.6); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .foto-card p { color: white; font-weight: bold; font-size: 1.6rem; margin-top: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        /* --- FOTOS SIEMPRE EN LÍNEA --- */
+        .fotos { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; /* Espacio entre fotos y corazón */
+            margin-top: 20px;
+            width: 100%;
+        }
+        .foto-card { 
+            width: 35%; /* Reducido para que quepa bien en móviles */
+            text-align: center; 
+        }
+        img { 
+            width: 100%; 
+            border-radius: 50%; 
+            aspect-ratio: 1/1; 
+            object-fit: cover; 
+            border: 3px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+        }
+        .foto-card p { color: white; font-weight: bold; font-size: 1.3rem; margin-top: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
 
-        .mensaje { margin-top: 30px; font-size: 1.5rem; line-height: 1.4; color: #ffffff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .mensaje { margin-top: 20px; font-size: 1.4rem; line-height: 1.3; color: #ffffff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
 
         /* --- SECCIÓN METAS (DESPLEGABLE) --- */
         .btn-metas {
             margin-top: 25px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-family: 'Dancing Script', cursive;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: 0.3s;
         }
-        .btn-metas:hover { background: rgba(255, 255, 255, 0.3); }
 
         #metas-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-out;
+            transition: max-height 0.6s ease-in-out;
             text-align: left;
-            margin-top: 15px;
         }
         .lista-metas {
             list-style: none;
-            padding: 0;
+            padding: 10px 0;
             color: white;
-            font-size: 1.3rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-size: 1.2rem;
         }
-        .lista-metas li { margin: 10px 0; display: flex; align-items: center; }
+        .lista-metas li { margin: 8px 0; display: flex; align-items: center; }
         .lista-metas li span { margin-right: 10px; }
 
         /* --- LLUVIA --- */
@@ -132,7 +146,7 @@
                 <img src="yo.jpg" alt="Gabriel">
                 <p>Gabriel</p>
             </div>
-            <div style="font-size: 2.5rem; color: #ff4d6d; text-shadow: 0 0 10px rgba(255,77,109,0.5);">❤</div>
+            <div style="font-size: 1.8rem; color: #ff4d6d; text-shadow: 0 0 10px rgba(255,77,109,0.5);">❤</div>
             <div class="foto-card">
                 <img src="ella.jpg" alt="Anny">
                 <p>Anny</p>
@@ -147,15 +161,10 @@
         
         <div id="metas-content">
             <ul class="lista-metas">
-                <li><span>🏠</span> Tener una prefabricada, o nuestro super bus de viaje.</li>
-                <li><span>✈</span> Viajar y conocer muchos sitios de chile (puedes manejar si gustas).</li>
-                <li><span>🛻</span> Tener nuestro auto o caminoneta, preferentemente la ford raptor, la hilux o la tundra (vendere mis dos bolitas)</li>
-                <li><span>🍱</span>Que me compres mi lonche, que vean q tengo dueña.</li>
-                <li><span>💻</span>Tener nuestras pc's gamer.</li>
-                <li><span>🍴</span>Cocinar juntos, comer bien y experimentar en la cocina.</li>
-                <li><span>💍</span>Mi mayor sueño es que podamos cazarnos algun dia, y permenecer a su lado por siempre ❤❤❤.</li>
-                <li><span>❤</span>No pienso dejar que abandonemos todo esto, dejame cumplir por favor...</li>
-                
+                <li><span>🏠</span> Tener nuestro propio hogar.</li>
+                <li><span>✈</span> Viajar y conocer lugares juntos.</li>
+                <li><span>💍</span> Un futuro compartiendo cada día.</li>
+                <li><span>🎓</span> Apoyarnos en cada logro personal.</li>
             </ul>
         </div>
     </div>
@@ -189,7 +198,6 @@
         }
         setInterval(crearCorazon, 300);
 
-        // --- LÓGICA DESPLEGABLE ---
         function toggleMetas() {
             const content = document.getElementById('metas-content');
             if (content.style.maxHeight && content.style.maxHeight !== "0px") {
@@ -199,16 +207,13 @@
             }
         }
 
-        // --- LÓGICA DE INICIO ---
         const audio = document.getElementById('cancion');
         const splash = document.getElementById('splash-screen');
-
         const iniciarExperiencia = () => {
             audio.play().catch(e => console.log("Audio block"));
             splash.classList.add('oculto');
             document.removeEventListener('pointerdown', iniciarExperiencia);
         };
-
         document.addEventListener('pointerdown', iniciarExperiencia);
     </script>
 </body>
