@@ -21,6 +21,7 @@
             padding: 20px 10px;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow-x: hidden; 
@@ -30,130 +31,302 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Pantalla de inicio - Fade lento */
+        /* Capa para oscurecer el fondo en Modo Noche */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0, 0); z-index: -2; transition: background 0.8s ease;
+            pointer-events: none;
+        }
+
+        /* --- ESTILOS MODO NOCHE --- */
+        body.modo-noche::before { background: rgba(0,0,0, 0.85); }
+        body.modo-noche .container, body.modo-noche #collage-burbuja {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 77, 109, 0.6);
+            box-shadow: 0 0 30px rgba(255, 77, 109, 0.3);
+        }
+        body.modo-noche h1, body.modo-noche .subtitulo, body.modo-noche .mensaje, body.modo-noche h2 {
+            text-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff4d6d;
+        }
+        body.modo-noche .btn-accion, body.modo-noche .btn-metas {
+            box-shadow: 0 0 15px rgba(255, 77, 109, 0.4);
+            border-color: rgba(255, 77, 109, 0.8);
+        }
+        body.modo-noche .rpg-stats { border-color: #ff4d6d; background: rgba(0,0,0,0.8); }
+        body.modo-noche .xp-bar { border-color: #ff4d6d; }
+
+        /* Botón Noche/Día */
+        #btn-noche {
+            position: fixed; top: 20px; right: 20px;
+            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem;
+            cursor: pointer; z-index: 1000; color: white; transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        #btn-noche:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.25); }
+
+        /* Visor de Fotos (Lightbox) */
+        #lightbox {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center;
+            z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        #lightbox.activo { opacity: 1; pointer-events: all; }
+        #lightbox img {
+            max-width: 90vw; max-height: 90vh; border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.8); box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            transform: scale(0.8); transition: transform 0.3s ease;
+        }
+        #lightbox.activo img { transform: scale(1); }
+
+        /* Velo negro inicial */
+        #velo-negro {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #000; z-index: 1; transition: opacity 3s ease;
+        }
+        #velo-negro.oculto { opacity: 0; pointer-events: none; }
+
+        /* Lienzo de explosión */
+        #canvas-explosion {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10000; pointer-events: none;
+        }
+
+        /* Pantalla splash inicial */
         #splash-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #000;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
-            transition: opacity 4s ease-in-out, visibility 4s step-end;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #000; display: flex; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 1s ease-in-out, visibility 1s step-end;
         }
         #splash-screen p { color: white; font-size: 1.8rem; animation: palpitar 2s infinite ease-in-out; }
         #splash-screen.oculto { opacity: 0; visibility: hidden; }
 
-        @keyframes palpitar {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
+        @keyframes palpitar { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* Contenedor Translúcido */
+        /* Cajas Translúcidas */
         .container {
-            background: rgba(255, 255, 255, 0.15); 
-            padding: 30px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            width: 95%;
-            backdrop-filter: blur(12px); 
+            background: transparent; padding: 30px 20px; border-radius: 30px;
+            border: 1px solid transparent; box-shadow: none; max-width: 500px;
+            width: 95%; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
+            position: relative; z-index: 10; margin: 10px auto;
+            transition: background 2s ease, border 2s ease, box-shadow 2s ease, backdrop-filter 2s ease;
+        }
+
+        .container.mostrar-fondo {
+            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
-            position: relative;
-            z-index: 10;
-            margin: auto; 
         }
 
-        h1 { color: #ffffff; font-size: 2.5rem; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .fade-in { opacity: 0; transition: opacity 2s ease-in; }
+        .fade-in.mostrar { opacity: 1; }
+
+        h1 { color: #ffffff; font-size: 2.5rem; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); transition: text-shadow 0.5s; }
         .subtitulo { font-size: 1.3rem; color: #ffffff; margin-bottom: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
-        #contador { font-size: 1.8rem; font-weight: 700; margin: 15px 0; color: #ffffff; text-shadow: 1px 1px 5px rgba(0,0,0,0.4); line-height: 1.2; }
+        #aniversario-box { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; }
 
-        /* Fotos en línea para móvil */
-        .fotos { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 10px; 
-            margin-top: 20px;
-            width: 100%;
+        #numero-dorado {
+            font-size: 6rem; font-weight: bold; color: #ffd700;
+            text-shadow: 0 0 15px #ffaa00, 0 0 30px #ff6600, 2px 2px 5px rgba(0,0,0,0.5);
+            transform: scale(0); opacity: 0; position: relative; z-index: 20;
         }
+        #numero-dorado.explotar { animation: animacionCargaExplosion 12s linear forwards; }
+
+        @keyframes animacionCargaExplosion {
+            0% { transform: scale(0); opacity: 0; filter: brightness(1); }
+            5% { transform: scale(1); opacity: 1; filter: brightness(1.5); }
+            20% { transform: scale(0.8) translate(3px, -3px); filter: brightness(2); }
+            35% { transform: scale(0.6) translate(-3px, 3px); filter: brightness(3); }
+            50% { transform: scale(0.4) translate(3px, 3px); filter: brightness(5); }
+            60% { transform: scale(0.2) translate(-2px, -2px); filter: brightness(8); }
+            66% { transform: scale(0.1) translate(0, 0); filter: brightness(10); } 
+            67% { transform: scale(2.5); filter: brightness(5); }
+            85% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1); filter: brightness(1); opacity: 1; }
+        }
+
+        #contador-detalle { font-size: 1.5rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); text-align: left; line-height: 1.2; font-weight: 700; }
+
+        .fotos { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; width: 100%; }
         .foto-card { width: 35%; text-align: center; }
-        img { 
-            width: 100%; 
-            border-radius: 50%; 
-            aspect-ratio: 1/1; 
-            object-fit: cover; 
-            border: 3px solid rgba(255, 255, 255, 0.6); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
-        }
+        .foto-card img { width: 100%; border-radius: 50%; aspect-ratio: 1/1; object-fit: cover; border: 3px solid rgba(255, 255, 255, 0.6); box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; }
         .foto-card p { color: white; font-weight: bold; font-size: 1.3rem; margin-top: 8px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .mensaje { margin-top: 20px; margin-bottom: 25px; font-size: 1.4rem; line-height: 1.3; color: #ffffff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
 
-        .mensaje { margin-top: 20px; font-size: 1.4rem; line-height: 1.3; color: #ffffff; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .btn-accion { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 10px 20px; border-radius: 20px; font-family: 'Dancing Script', cursive; font-size: 1.4rem; cursor: pointer; transition: transform 0.2s, background 0.3s, box-shadow 0.3s; margin: 10px 0; }
+        .btn-accion:active { transform: scale(0.95); }
 
-        /* Metas Desplegables */
-        .btn-metas {
-            margin-top: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.2rem;
+        #collage-burbuja {
+            display: none; width: 95vw; max-width: 1000px; margin: 10px auto;
+            background: rgba(255, 255, 255, 0.15); border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px);
+            padding: 20px; transform-origin: center top; transition: background 0.8s, border 0.8s;
+        }
+
+        .burbuja-activa { display: block !important; animation: expandirBurbuja 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes expandirBurbuja { 0% { transform: scale(0.2); opacity: 0; filter: blur(10px); } 60% { transform: scale(1.02); opacity: 1; filter: blur(0px); } 100% { transform: scale(1); opacity: 1; } }
+
+        .grilla-fotos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); grid-auto-rows: 130px; grid-auto-flow: dense; gap: 12px; }
+        .grilla-fotos img { 
+            width: 100%; height: 100%; object-fit: cover; border-radius: 12px; 
+            border: 2px solid rgba(255, 255, 255, 0.4); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease, box-shadow 0.4s ease;
             cursor: pointer;
         }
+        .grilla-fotos img:hover { transform: scale(1.18); filter: brightness(1.2); box-shadow: 0 15px 35px rgba(255, 215, 0, 0.7); z-index: 10; position: relative; }
+        .f-v { grid-row: span 2; } .f-h { grid-column: span 2; } .f-g { grid-row: span 2; grid-column: span 2; } 
 
-        #metas-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.8s ease-in-out;
-            text-align: left;
+        /* --- ASIDE: ESTADÍSTICAS RPG FLOTANTES --- */
+        .rpg-stats {
+            position: fixed; left: 20px; top: 50%; transform: translateY(-50%); width: 300px;
+            background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.5); font-family: sans-serif; color: #fff;
+            text-align: left; box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 10px 25px rgba(0,0,0,0.3);
+            transition: opacity 0.3s ease, transform 0.5s ease; z-index: 10; backdrop-filter: blur(10px);
         }
-        .lista-metas {
-            list-style: none;
-            padding: 10px 0;
-            color: white;
-            font-size: 1.2rem;
+        .rpg-stats h3 { font-family: 'Dancing Script', cursive; font-size: 1.8rem; margin: 0 0 10px 0; text-align: center; color: #ffd700; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 5px; font-size: 0.95rem; }
+        .stat-row:last-child { border-bottom: none; margin-bottom: 15px; }
+        .stat-value { font-weight: bold; color: #ffd700; }
+        
+        .xp-bar-container p { margin: 0 0 5px 0; font-size: 0.85rem; color: #ddd; text-align: center; letter-spacing: 1px;}
+        .xp-bar { width: 100%; height: 12px; background: rgba(0,0,0,0.6); border-radius: 10px; border: 1px solid #ffd700; overflow: hidden; }
+        .xp-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ffaa00, #ff4d6d); transition: width 1.5s ease-out; }
+
+        @media (max-width: 1100px) {
+            .rpg-stats { position: relative; left: 0; top: 0; transform: none; width: 90%; max-width: 500px; margin: 20px auto; }
         }
+
+        #metas-content { max-height: 0; overflow: hidden; transition: max-height 0.8s ease-in-out; text-align: left; }
+        .lista-metas { list-style: none; padding: 10px 0; color: white; font-size: 1.2rem; }
         .lista-metas li { margin: 12px 0; display: flex; align-items: flex-start; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
         .lista-metas li span { margin-right: 12px; font-size: 1.4rem; }
 
-        /* Lluvia */
         .corazon { position: fixed; top: -10vh; color: #ff4d6d; font-size: 1.5rem; z-index: 1; pointer-events: none; animation: caer linear forwards; }
         @keyframes caer { to { transform: translateY(110vh) translateX(20px); } }
+
+        /* --- NOTIFICACIÓN GAMER --- */
+        #logro-notificacion {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95); border: 1px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); border-radius: 50px;
+            display: flex; align-items: center; padding: 10px 25px; gap: 18px;
+            z-index: 100000; transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
+        }
+        #logro-notificacion.mostrar-logro { bottom: 30px; }
+        .logro-icono { font-size: 2.2rem; }
+        .logro-texto { display: flex; flex-direction: column; text-align: left; font-family: sans-serif; }
+        .logro-texto strong { color: #ffd700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+        .logro-texto span { color: #ffffff; font-size: 1.1rem; font-weight: bold; }
+
+        /* --- STICKERS PERSONALIZADOS --- */
+        .sticker {
+            position: fixed; width: 70px; height: auto; cursor: pointer; z-index: 50;
+            transition: transform 0.2s ease; animation: flotar 4s infinite ease-in-out;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        @keyframes explosionSutil {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Pegatinas / Stickers (Cambia el src por tus imágenes) -->
+    <img src="sticker1.png" class="sticker fade-in" style="top: 15%; left: 3%; animation-delay: 0s;" onclick="explotarSticker(event, this)" alt="Sticker">
+    <img src="sticker2.png" class="sticker fade-in" style="bottom: 10%; left: 5%; animation-delay: 1s;" onclick="explotarSticker(event, this)" alt="Sticker">
+    <img src="sticker3.png" class="sticker fade-in" style="bottom: 15%; right: 4%; animation-delay: 2s;" onclick="explotarSticker(event, this)" alt="Sticker">
+    <img src="sticker4.png" class="sticker fade-in" style="top: 40%; right: 2%; animation-delay: 0.5s;" onclick="explotarSticker(event, this)" alt="Sticker">
+
+    <div id="logro-notificacion">
+        <div class="logro-icono">🏆</div>
+        <div class="logro-texto">
+            <strong>Logro Desbloqueado</strong>
+            <span>2 Años de Aventuras Juntos</span>
+        </div>
+    </div>
+
+    <div id="lightbox" onclick="cerrarLightbox()">
+        <img id="lightbox-img" src="" alt="Zoom">
+    </div>
+
+    <button id="btn-noche" class="fade-in" onclick="toggleNoche()">🌙</button>
+
+    <div id="velo-negro"></div>
+    <canvas id="canvas-explosion"></canvas>
+    
     <div id="splash-screen">
         <p>toca en cualquier lugar...</p>
     </div>
 
-    <audio id="cancion" loop preload="auto">
-        <source src="musica.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="cancion" loop preload="auto"><source src="musica.mp3" type="audio/mpeg"></audio>
+    <audio id="sonido-explosion" preload="auto"><source src="explosion.mp3" type="audio/mpeg"></audio>
 
     <div class="container">
-        <h1>Anny y Gabriel</h1>
-        <p class="subtitulo">Nuestro tiempo juntos:</p>
-        <div id="contador">Calculando...</div>
+        <h1 class="fade-in">Anny y Gabriel</h1>
+        <p class="subtitulo fade-in">Nuestro tiempo juntos:</p>
         
-        <div class="fotos">
-            <div class="foto-card">
-                <img src="yo.jpg" alt="Gabriel">
-                <p>Gabriel</p>
-            </div>
+        <div id="aniversario-box">
+            <div id="numero-dorado"></div>
+            <div id="contador-detalle" class="fade-in">Calculando...</div>
+        </div>
+        
+        <div class="fotos fade-in">
+            <div class="foto-card"><img src="ella.jpg" alt="Anny" onclick="abrirLightbox(this.src)"><p>Anny</p></div>
             <div style="font-size: 1.8rem; color: #ff4d6d; text-shadow: 0 0 10px rgba(255,77,109,0.5);">❤</div>
-            <div class="foto-card">
-                <img src="ella.jpg" alt="Anny">
-                <p>Anny</p>
-            </div>
+            <div class="foto-card"><img src="yo.jpg" alt="Gabriel" onclick="abrirLightbox(this.src)"><p>Gabriel</p></div>
         </div>
 
-        <div class="mensaje">
+        <div class="mensaje fade-in">
             "Quiero dedicar cada uno de mis dias a estar contigo, a progresar juntos, a cumplir y tener todo lo q siempre hemos soñado.. Te elegi a ti, y siempre te elegire a ti. Te amo mi princesa hermosa... prometo cuidarte por siempre y darte todo lo q este a mi alcance ❤"
         </div>
 
-        <button class="btn-metas" onclick="toggleMetas()">✨ Nuestras Metas a Futuro</button>
+        <button class="btn-accion fade-in" onclick="toggleCollage()">📸 Fotitos</button>
+    </div>
+
+    <!-- ASIDE RPG Stats -->
+    <aside class="rpg-stats fade-in">
+        <h3>⚔️ Party Info ⚔️</h3>
+        <div class="stat-row"><span>Gremio:</span> <span class="stat-value">Los Leones 🦁</span></div>
+        <div class="stat-row"><span>Nivel de Vínculo:</span> <span class="stat-value">Max (Lvl 999) 🌟</span></div>
+        <div class="stat-row"><span>Rol Gabriel (Dreambell):</span> <span class="stat-value">Tanque / DPS 🛡️</span></div>
+        <div class="stat-row"><span>Rol Anny (Anethe):</span> <span class="stat-value">Healer / Soporte 💖</span></div>
+        <div class="stat-row"><span>Fama de Pareja:</span> <span class="stat-value">∞ (Incalculable) ✨</span></div>
+        <div class="stat-row"><span>Estado Actual:</span> <span class="stat-value">Buff de amor 🛡️</span></div>
+        
+        <div class="xp-bar-container">
+            <p>PROGRESO AL PRÓXIMO ANIVERSARIO</p>
+            <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+        </div>
+    </aside>
+
+    <div id="collage-burbuja">
+        <div class="grilla-fotos">
+            <img src="fotos/foto1.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto2.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto3.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto4.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto5.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto6.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto7.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto8.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto9.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto10.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto11.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto12.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto13.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto14.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+            <img src="fotos/foto15.jpg" alt="Recuerdo" onclick="abrirLightbox(this.src)">
+        </div>
+    </div>
+
+    <div class="container fade-in">
+        <button class="btn-accion" onclick="toggleMetas()">✨ Nuestras Metas a Futuro</button>
         
         <div id="metas-content">
             <ul class="lista-metas">
@@ -171,52 +344,192 @@
     </div>
 
     <script>
-        const fechaInicio = new Date(2024, 7, 29, 0, 0, 0); 
-
+        // 1. Contadores y XP RPG
+        const fechaInicio = new Date(2024, 6, 31, 0, 0, 0); 
+        
         function actualizarContador() {
-            const ahoraCL = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Santiago"}));
-            const diff = ahoraCL - fechaInicio;
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const ahora = new Date();
+            let anios = ahora.getFullYear() - fechaInicio.getFullYear();
+            let meses = ahora.getMonth() - fechaInicio.getMonth();
+            let dias = ahora.getDate() - fechaInicio.getDate();
+            if (dias < 0) { meses--; dias += new Date(ahora.getFullYear(), ahora.getMonth(), 0).getDate(); }
+            if (meses < 0) { anios--; meses += 12; }
+            const diff = ahora - fechaInicio;
             const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
-            document.getElementById('contador').innerHTML = `${d} días, ${h}h, ${m}m y ${s}s`;
+            document.getElementById('numero-dorado').innerText = anios;
+            document.getElementById('contador-detalle').innerHTML = `${anios === 1 ? "Año..." : "Años..."}<br>${meses} meses y ${dias} días<br><span style="font-size: 1.1rem; font-weight: normal;">${h}h ${m}m ${s}s</span>`;
         }
-        setInterval(actualizarContador, 1000);
-        actualizarContador();
+        
+        function calcularXPRPG() {
+            const ahora = new Date();
+            let ultimoAniversario = new Date(ahora.getFullYear(), 6, 31);
+            if (ahora < ultimoAniversario) {
+                ultimoAniversario.setFullYear(ahora.getFullYear() - 1);
+            }
+            const proximoAniversario = new Date(ultimoAniversario.getFullYear() + 1, 6, 31);
+            
+            const tiempoTotal = proximoAniversario - ultimoAniversario;
+            const tiempoTranscurrido = ahora - ultimoAniversario;
+            const porcentaje = (tiempoTranscurrido / tiempoTotal) * 100;
+            
+            document.getElementById('xp-fill').style.width = porcentaje + '%';
+        }
 
+        setInterval(actualizarContador, 1000); 
+        actualizarContador();
+        setTimeout(calcularXPRPG, 13000);
+
+        // 2. Corazones y Efectos
         function crearCorazon() {
-            const c = document.createElement('div');
-            c.classList.add('corazon');
-            c.innerHTML = '❤';
-            c.style.left = Math.random() * 100 + 'vw';
-            c.style.fontSize = (Math.random() * 1.5 + 0.5) + 'rem';
-            const dur = Math.random() * 4 + 3;
-            c.style.animationDuration = dur + 's';
-            c.style.opacity = Math.random() * 0.5 + 0.5;
-            document.body.appendChild(c);
-            setTimeout(() => c.remove(), dur * 1000);
+            const c = document.createElement('div'); c.classList.add('corazon'); c.innerHTML = '❤';
+            c.style.left = Math.random() * 100 + 'vw'; c.style.fontSize = (Math.random() * 1.5 + 0.5) + 'rem';
+            const dur = Math.random() * 4 + 3; c.style.animationDuration = dur + 's'; c.style.opacity = Math.random() * 0.5 + 0.5;
+            document.body.appendChild(c); setTimeout(() => c.remove(), dur * 1000);
         }
         setInterval(crearCorazon, 300);
 
-        function toggleMetas() {
-            const content = document.getElementById('metas-content');
-            if (content.style.maxHeight && content.style.maxHeight !== "0px") {
-                content.style.maxHeight = "0px";
+        // 3. Canvas Partículas
+        const canvas = document.getElementById('canvas-explosion'); const ctx = canvas.getContext('2d');
+        let particulas = []; const coloresChispas = ['#ffaa00', '#ffd700', '#ffffff', '#ff4500'];
+        class Particula {
+            constructor(x, y) {
+                this.x = x; this.y = y; const angulo = Math.random() * Math.PI * 2; const vel = Math.random() * 25 + 5;
+                this.vx = Math.cos(angulo) * vel; this.vy = Math.sin(angulo) * vel;
+                this.radio = Math.random() * 3 + 1.5; this.color = coloresChispas[Math.floor(Math.random() * coloresChispas.length)];
+                this.alpha = 1; this.decay = Math.random() * 0.008 + 0.004; this.g = 0.2; this.f = 0.94; 
+            }
+            dibujar() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath(); ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.shadowBlur = 15; ctx.shadowColor = this.color; ctx.fill(); ctx.restore(); }
+            actualizar() { this.vx *= this.f; this.vy *= this.f; this.vy += this.g; this.x += this.vx; this.y += this.vy; this.alpha -= this.decay; }
+        }
+        function lanzarExplosionCanvas() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight; particulas = [];
+            for (let i = 0; i < 200; i++) particulas.push(new Particula(canvas.width/2, canvas.height/2));
+            function animar() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); let activas = false;
+                particulas.forEach(p => { if (p.alpha > 0) { p.actualizar(); p.dibujar(); activas = true; } });
+                if (activas) requestAnimationFrame(animar); else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            animar();
+        }
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        // 4. Modo Noche, Lightbox y Stickers
+        function toggleNoche() {
+            document.body.classList.toggle('modo-noche');
+            const btn = document.getElementById('btn-noche');
+            btn.innerText = document.body.classList.contains('modo-noche') ? '☀️' : '🌙';
+        }
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        function abrirLightbox(src) { lightboxImg.src = src; lightbox.classList.add('activo'); }
+        function cerrarLightbox() { lightbox.classList.remove('activo'); }
+
+        function explotarSticker(e, elemento) {
+            elemento.style.animation = 'none';
+            elemento.style.transform = 'scale(0.8)';
+            setTimeout(() => { 
+                elemento.style.transform = ''; 
+                elemento.style.animation = 'flotar 4s infinite ease-in-out';
+            }, 200);
+
+            for(let i = 0; i < 8; i++) {
+                const corazon = document.createElement('div');
+                corazon.innerHTML = '❤';
+                corazon.style.position = 'fixed';
+                corazon.style.left = e.clientX + 'px';
+                corazon.style.top = e.clientY + 'px';
+                corazon.style.color = document.body.classList.contains('modo-noche') ? '#ff4d6d' : '#ff3366';
+                corazon.style.fontSize = (Math.random() * 12 + 12) + 'px';
+                corazon.style.pointerEvents = 'none';
+                corazon.style.zIndex = '100000';
+                
+                const angulo = Math.random() * Math.PI * 2;
+                const distancia = Math.random() * 50 + 20; 
+                const tx = Math.cos(angulo) * distancia + 'px';
+                const ty = Math.sin(angulo) * distancia + 'px';
+                
+                corazon.style.setProperty('--tx', tx);
+                corazon.style.setProperty('--ty', ty);
+                corazon.style.animation = 'explosionSutil 0.8s ease-out forwards';
+                
+                document.body.appendChild(corazon);
+                setTimeout(() => corazon.remove(), 800);
+            }
+        }
+
+        // 5. Adaptación Collage y Control del Aside
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.grilla-fotos img').forEach(img => {
+                const adaptar = () => {
+                    const ratio = img.naturalWidth / img.naturalHeight;
+                    if (ratio >= 1.2) img.classList.add('f-h'); else if (ratio <= 0.8) img.classList.add('f-v');
+                    else if (Math.random() > 0.8) img.classList.add('f-g'); 
+                };
+                if (img.complete) adaptar(); else img.addEventListener('load', adaptar);
+            });
+        });
+
+        function toggleCollage() {
+            const collage = document.getElementById('collage-burbuja');
+            const stats = document.querySelector('.rpg-stats');
+
+            if (collage.classList.contains('burbuja-activa')) {
+                collage.classList.remove('burbuja-activa');
+                setTimeout(() => { 
+                    collage.style.display = 'none'; 
+                    stats.style.display = 'block';
+                    setTimeout(() => { stats.style.opacity = '1'; }, 50);
+                }, 400);
             } else {
-                content.style.maxHeight = content.scrollHeight + "px";
-                // Pequeño delay para que el scroll acompañe la apertura
+                stats.style.opacity = '0';
                 setTimeout(() => {
-                    content.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    stats.style.display = 'none';
+                    collage.style.display = 'block'; 
+                    setTimeout(() => { 
+                        collage.classList.add('burbuja-activa'); 
+                        collage.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+                    }, 10);
                 }, 300);
             }
         }
 
-        const audio = document.getElementById('cancion');
-        const splash = document.getElementById('splash-screen');
+        function toggleMetas() {
+            const content = document.getElementById('metas-content');
+            if (content.style.maxHeight && content.style.maxHeight !== "0px") content.style.maxHeight = "0px";
+            else { content.style.maxHeight = content.scrollHeight + "px"; setTimeout(() => content.scrollIntoView({ behavior: 'smooth', block: 'end' }), 300); }
+        }
+
+        // 6. Secuencia Inicial
         const iniciarExperiencia = () => {
-            audio.play().catch(e => console.log("Audio block"));
-            splash.classList.add('oculto');
+            document.getElementById('splash-screen').classList.add('oculto');
+            setTimeout(() => {
+                document.getElementById('numero-dorado').classList.add('explotar'); 
+                
+                setTimeout(() => {
+                    document.getElementById('sonido-explosion').play().catch(e => console.log("Audio"));
+                    document.getElementById('cancion').play().catch(e => console.log("Audio"));
+                    lanzarExplosionCanvas();
+                    document.getElementById('velo-negro').classList.add('oculto');
+                }, 8000);
+
+                // ¡AQUÍ ESTÁ LA CORRECCIÓN! 
+                setTimeout(() => {
+                    // Primero pintamos los fondos de las cajas (containers y rpg-stats)
+                    document.querySelectorAll('.container, .rpg-stats').forEach(c => c.classList.add('mostrar-fondo'));
+                    // Luego hacemos que TODOS los elementos .fade-in (textos, botones, fotos, y stickers) aparezcan
+                    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('mostrar'));
+                }, 12000); 
+
+                setTimeout(() => {
+                    const logro = document.getElementById('logro-notificacion');
+                    logro.classList.add('mostrar-logro');
+                    setTimeout(() => { logro.classList.remove('mostrar-logro'); }, 6000);
+                }, 14500);
+                
+            }, 300); 
             document.removeEventListener('pointerdown', iniciarExperiencia);
         };
         document.addEventListener('pointerdown', iniciarExperiencia);
